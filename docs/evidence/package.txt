@@ -1,0 +1,110 @@
+
+> tuprel-editors@0.1.0 package
+> npm run test && cd extensions/vscode && vsce package --out ../../artifacts/tuprel-vscode-0.1.0.vsix
+
+
+> tuprel-editors@0.1.0 test
+> npm run build && node --test --test-reporter=tap dist/tests/*.test.js
+
+
+> tuprel-editors@0.1.0 build
+> tsc -p tsconfig.json
+
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice
+TAP version 13
+# Subtest: declarations and identifiers
+ok 1 - declarations and identifiers
+  ---
+  duration_ms: 20.193538
+  type: 'test'
+  ...
+# Subtest: all official scalar types retain type scopes in fields
+ok 2 - all official scalar types retain type scopes in fields
+  ---
+  duration_ms: 10.326555
+  type: 'test'
+  ...
+# Subtest: only verified attributes and block attributes
+ok 3 - only verified attributes and block attributes
+  ---
+  duration_ms: 3.904679
+  type: 'test'
+  ...
+# Subtest: booleans, negative integers, punctuation, optional and assignment
+ok 4 - booleans, negative integers, punctuation, optional and assignment
+  ---
+  duration_ms: 4.583263
+  type: 'test'
+  ...
+# Subtest: comments and strings isolate keywords and attribute-looking content
+ok 5 - comments and strings isolate keywords and attribute-looking content
+  ---
+  duration_ms: 3.662183
+  type: 'test'
+  ...
+# Subtest: block comments resume; unterminated strings recover at newline
+ok 6 - block comments resume; unterminated strings recover at newline
+  ---
+  duration_ms: 1.348574
+  type: 'test'
+  ...
+# Subtest: LF and CRLF produce equivalent tokens; documents have independent state
+ok 7 - LF and CRLF produce equivalent tokens; documents have independent state
+  ---
+  duration_ms: 5.259783
+  type: 'test'
+  ...
+# Subtest: pinned upstream fixtures are unchanged and tokenize without modifying bytes
+ok 8 - pinned upstream fixtures are unchanged and tokenize without modifying bytes
+  ---
+  duration_ms: 9.994085
+  type: 'test'
+  ...
+# Subtest: manifest provides safe declarative support with no Java or activation code
+ok 9 - manifest provides safe declarative support with no Java or activation code
+  ---
+  duration_ms: 0.560115
+  type: 'test'
+  ...
+1..9
+# tests 9
+# suites 0
+# pass 9
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 167.226738
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice
+ INFO  Files included in the VSIX:
+tuprel-vscode-0.1.0.vsix
+├─ [Content_Types].xml 
+├─ extension.vsixmanifest 
+└─ extension/
+   ├─ LICENSE.txt [11.09 KB]
+   ├─ changelog.md 
+   ├─ language-configuration.json [1.03 KB]
+   ├─ package.json [1.21 KB]
+   ├─ readme.md 
+   ├─ icons/
+   │  ├─ tuprel-dark.svg [0.14 KB]
+   │  └─ tuprel-light.svg [0.14 KB]
+   ├─ snippets/
+   │  └─ tuprel.json [0.9 KB]
+   └─ syntaxes/
+      └─ tuprel.tmLanguage.json [2.52 KB]
+
+ DONE  Packaged: ../../artifacts/tuprel-vscode-0.1.0.vsix (11 files, 9.27 KB)
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice

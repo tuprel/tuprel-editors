@@ -1,0 +1,82 @@
+
+> tuprel-editors@0.1.0 test
+> npm run build && node --test --test-reporter=tap dist/tests/*.test.js
+
+
+> tuprel-editors@0.1.0 build
+> tsc -p tsconfig.json
+
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice
+TAP version 13
+# Subtest: declarations and identifiers
+ok 1 - declarations and identifiers
+  ---
+  duration_ms: 25.043474
+  type: 'test'
+  ...
+# Subtest: all official scalar types retain type scopes in fields
+ok 2 - all official scalar types retain type scopes in fields
+  ---
+  duration_ms: 17.679087
+  type: 'test'
+  ...
+# Subtest: only verified attributes and block attributes
+ok 3 - only verified attributes and block attributes
+  ---
+  duration_ms: 7.565682
+  type: 'test'
+  ...
+# Subtest: booleans, negative integers, punctuation, optional and assignment
+ok 4 - booleans, negative integers, punctuation, optional and assignment
+  ---
+  duration_ms: 6.58331
+  type: 'test'
+  ...
+# Subtest: comments and strings isolate keywords and attribute-looking content
+ok 5 - comments and strings isolate keywords and attribute-looking content
+  ---
+  duration_ms: 2.978643
+  type: 'test'
+  ...
+# Subtest: block comments resume; unterminated strings recover at newline
+ok 6 - block comments resume; unterminated strings recover at newline
+  ---
+  duration_ms: 4.984649
+  type: 'test'
+  ...
+# Subtest: LF and CRLF produce equivalent tokens; documents have independent state
+ok 7 - LF and CRLF produce equivalent tokens; documents have independent state
+  ---
+  duration_ms: 7.450958
+  type: 'test'
+  ...
+# Subtest: pinned upstream fixtures are unchanged and tokenize without modifying bytes
+ok 8 - pinned upstream fixtures are unchanged and tokenize without modifying bytes
+  ---
+  duration_ms: 9.660902
+  type: 'test'
+  ...
+# Subtest: manifest provides safe declarative support with no Java or activation code
+ok 9 - manifest provides safe declarative support with no Java or activation code
+  ---
+  duration_ms: 1.000348
+  type: 'test'
+  ...
+1..9
+# tests 9
+# suites 0
+# pass 9
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 193.549235
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice

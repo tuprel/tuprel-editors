@@ -1,0 +1,38 @@
+[
+  {
+    "file": "upstream/complete.tuprel",
+    "repository": "tuprel/tuprel",
+    "revision": "ae3776c28c328c7f6472df1f32f832d17b9f282a",
+    "path": "tuprel-schema/src/test/resources/schemas/valid/complete.tuprel",
+    "sha256": "b423be50dff6cb83b571f7a043d51d24d160dc086358b4389f95ec60dc862823"
+  },
+  {
+    "file": "upstream/playground.tuprel",
+    "repository": "tuprel/tuprel",
+    "revision": "ae3776c28c328c7f6472df1f32f832d17b9f282a",
+    "path": "examples/tuprel-playground/tuprel/schema.tuprel",
+    "sha256": "e8f4a27dc97fc2b77dd4bc0026cf5f3ae03f78a3dbb02c660e35b27de4f2ee3b"
+  },
+  {
+    "file": "upstream/staged-consumer.tuprel",
+    "repository": "tuprel/tuprel",
+    "revision": "ae3776c28c328c7f6472df1f32f832d17b9f282a",
+    "path": "examples/staged-consumer/tuprel/schema.tuprel",
+    "sha256": "0831afafa621d4b1d42f8fae69a7f1a36b076d24cb052a0ce38782287659cdd3"
+  },
+  {
+    "file": "upstream/unknown-type.tuprel",
+    "repository": "tuprel/tuprel",
+    "revision": "ae3776c28c328c7f6472df1f32f832d17b9f282a",
+    "path": "tuprel-schema/src/test/resources/schemas/invalid/unknown-type.tuprel",
+    "sha256": "5656c03f97ce5aa8df8ae817a2b6791af72127d13a242549946f7beb313e2baf"
+  },
+  {
+    "file": "upstream/spring-products-api.tuprel",
+    "repository": "tuprel/tuprel",
+    "revision": "8ee68e75be0852a32c704915dccc90709335168b",
+    "path": "examples/spring-products-api/tuprel/schema.tuprel",
+    "pr": 103,
+    "sha256": "54ccb1bf1d66c9b8dccdb97a70f287244c0ac16fc002725d4c886f75e4dfc31a"
+  }
+]

@@ -1,0 +1,21 @@
+{
+  "name": "tuprel-editors",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test --test-reporter=tap dist/tests/*.test.js",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "package": "npm run test && cd extensions/vscode && vsce package --out ../../artifacts/tuprel-vscode-0.1.0.vsix"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.11",
+    "@vscode/vsce": "4.1.1",
+    "typescript": "5.9.3",
+    "vscode-oniguruma": "2.0.1",
+    "vscode-textmate": "9.3.2"
+  },
+  "overrides": {
+    "minimatch": "11.0.8"
+  }
+}
