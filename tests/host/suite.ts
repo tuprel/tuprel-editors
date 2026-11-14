@@ -60,7 +60,8 @@ export async function run(): Promise<void> {
                 return (error as NodeJS.ErrnoException).code === 'ESRCH';
             }
         }, 'Java process terminated');
-        console.log('PASS: delayed diagnostics and edits discarded, Java process terminated after stop');
+        assert.equal(await fs.readFile(path.join(root, 'mock.exit'), 'utf8'), 'graceful');
+        console.log('PASS: delayed diagnostics and edits discarded, Java process terminated after shutdown and exit');
         return;
     }
 

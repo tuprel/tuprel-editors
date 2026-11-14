@@ -1,6 +1,7 @@
 package dev.tuprel.lsp;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import java.io.BufferedInputStream;
 import java.io.EOFException;
@@ -10,7 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public final class TuprelLanguageServer {
-    private static final Gson JSON = new Gson();
+    private static final Gson JSON = new GsonBuilder().serializeNulls().create();
     private static final BufferedInputStream INPUT = new BufferedInputStream(System.in);
 
     public static void main(String[] args) throws Exception {
@@ -51,7 +52,10 @@ public final class TuprelLanguageServer {
                     }
                 }
                 case "shutdown" -> respond(message, "null");
-                case "exit" -> { return; }
+                case "exit" -> {
+                    Files.writeString(control.resolve("mock.exit"), "graceful");
+                    return;
+                }
                 default -> { }
             }
         }
