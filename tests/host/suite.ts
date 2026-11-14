@@ -3,6 +3,7 @@ import * as fs from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import * as path from 'node:path';
 import * as vscode from 'vscode';
+import { permitsServer } from '../../extensions/vscode/src/documents';
 
 const good = 'model User {\n    id Int @id\n}\n';
 const malformed = 'model User{ id Int @id }';
@@ -71,7 +72,7 @@ export async function run(): Promise<void> {
         await vscode.window.showTextDocument(snippet);
         await vscode.commands.executeCommand('editor.action.insertSnippet', {langId: 'tuprel', name: 'Model'});
         assert.match(snippet.getText(), /model .*\{/);
-        console.log('PASS: Restricted Mode preserves language and snippets and disables the formatter');
+        console.log('PASS: ' + process.env.TUPREL_TEST_MODE + ' workspace preserves syntax and snippets and disables the formatter');
         return;
     }
 
@@ -81,6 +82,21 @@ export async function run(): Promise<void> {
     assert.match(lexical.message, /Unexpected character/);
     await change(first, 'model');
     await until(() => diagnostics(first).some(item => String(item.code).startsWith('TUPREL-SCHEMA-PARSE-')), 'syntax diagnostic');
+    assert.equal(permitsServer(true, undefined, ['tuprel-test']), false);
+    assert.equal(permitsServer(true, 'ssh-remote', ['file']), false);
+    const provider = vscode.workspace.registerTextDocumentContentProvider('tuprel-test', {
+        provideTextDocumentContent: () => 'model User {}',
+    });
+    try {
+        const virtual = await vscode.workspace.openTextDocument(vscode.Uri.parse('tuprel-test:/virtual.tuprel'));
+        assert.equal(virtual.languageId, 'tuprel');
+        assert.deepEqual(await format(virtual) ?? [], []);
+        await format(first);
+        assert.deepEqual(diagnostics(virtual), []);
+    } finally {
+        provider.dispose();
+    }
+    console.log('PASS: virtual document supports syntax without Java features; virtual workspace launch is denied');
     const second = await vscode.workspace.openTextDocument({language: 'tuprel', content: 'model Other { id Missing @id }'});
     await vscode.window.showTextDocument(second);
     await until(() => diagnostics(second).some(item => String(item.code).startsWith('TUPREL-SCHEMA-SEM-')), 'semantic diagnostic');

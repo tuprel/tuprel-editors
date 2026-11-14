@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { permitsServer } from './documents';
+import { documentSelector, permitsServer } from './documents';
 import { Session } from './session';
 
 let session: Session | undefined;
@@ -65,6 +65,16 @@ export function activate(context: vscode.ExtensionContext): Promise<void> {
             }
         }),
     );
+    if (!vscode.workspace.textDocuments.some(document => vscode.languages.match(documentSelector, document))) {
+        const listener = vscode.workspace.onDidOpenTextDocument(document => {
+            if (vscode.languages.match(documentSelector, document)) {
+                listener.dispose();
+                void enqueue(restart);
+            }
+        });
+        context.subscriptions.push(listener);
+        return Promise.resolve();
+    }
     return enqueue(restart);
 }
 
