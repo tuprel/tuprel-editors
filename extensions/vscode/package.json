@@ -1,7 +1,7 @@
 {
   "name": "tuprel-vscode",
   "displayName": "TUPREL",
-  "description": "TUPREL schema syntax highlighting, snippets and editing support.",
+  "description": "TUPREL schema highlighting, diagnostics and official formatting.",
   "version": "0.1.0",
   "publisher": "tuprel",
   "license": "Apache-2.0",
@@ -18,10 +18,16 @@
   },
   "capabilities": {
     "untrustedWorkspaces": {
-      "supported": true
+      "supported": "limited",
+      "description": "Syntax and snippets are available. Running the local Java server requires workspace trust.",
+      "restrictedConfigurations": [
+        "tuprel.server.javaPath",
+        "tuprel.server.distributionPath"
+      ]
     },
     "virtualWorkspaces": {
-      "supported": true
+      "supported": "limited",
+      "description": "Syntax and snippets are available. The Java server requires a local workspace."
     }
   },
   "contributes": {
@@ -54,6 +60,33 @@
         "language": "tuprel",
         "path": "./snippets/tuprel.json"
       }
-    ]
-  }
+    ],
+    "commands": [
+      {
+        "command": "tuprel.restartLanguageServer",
+        "title": "TUPREL: Restart Language Server"
+      }
+    ],
+    "configuration": {
+      "title": "TUPREL",
+      "properties": {
+        "tuprel.server.javaPath": {
+          "type": "string",
+          "default": "",
+          "scope": "application",
+          "description": "Absolute path to a Java 21 executable (java.exe on Windows)."
+        },
+        "tuprel.server.distributionPath": {
+          "type": "string",
+          "default": "",
+          "scope": "application",
+          "description": "Absolute path to an official TUPREL Language Server installation directory containing lib/."
+        }
+      }
+    }
+  },
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onLanguage:tuprel"
+  ]
 }

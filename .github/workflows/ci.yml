@@ -32,3 +32,48 @@ jobs:
             artifacts/*.vsix
             artifacts/SHA256SUMS
           if-no-files-found: error
+
+  extension-host:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: tuprel/tuprel
+          ref: ad0c9c6898f5d924f725b6a6c49ac78ade272849
+          path: .official-server
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Build pinned official server
+        working-directory: .official-server
+        shell: bash
+        run: |
+          test "$(git rev-parse HEAD)" = ad0c9c6898f5d924f725b6a6c49ac78ade272849
+          ./gradlew :tuprel-language-server:installDist --no-daemon --dependency-verification strict
+      - run: npm ci --ignore-scripts
+      - run: npm run package
+      - run: python tools/check-vsix.py
+      - name: Run tests from the installed VSIX
+        shell: bash
+        run: |
+          export TUPREL_TEST_DISTRIBUTION="$GITHUB_WORKSPACE/.official-server/tuprel-language-server/build/install/tuprel-language-server"
+          export TUPREL_TEST_JAVA="$JAVA_HOME/bin/java"
+          case "$RUNNER_OS" in
+            Windows) export TUPREL_TEST_JAVA="$TUPREL_TEST_JAVA.exe"; npm run test:host ;;
+            Linux) xvfb-run -a npm run test:host ;;
+            macOS) npm run test:host ;;
+          esac

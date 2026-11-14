@@ -90,12 +90,16 @@ test('pinned upstream fixtures are unchanged and tokenize without modifying byte
     assert.deepEqual(fs.readFileSync(file), before);
   }
 });
-test('manifest provides safe declarative support with no Java or activation code', () => {
+test('manifest preserves declarative support and restricts Java configuration', () => {
   const manifest = JSON.parse(read('package.json'));
   assert.deepEqual(manifest.contributes.languages[0].extensions,['.tuprel']);
-  assert.equal(manifest.main, undefined);
+  assert.equal(manifest.main, "./dist/extension.js");
   assert.equal(manifest.dependencies, undefined);
-  assert.equal(manifest.capabilities.untrustedWorkspaces.supported,true);
+  assert.equal(manifest.capabilities.untrustedWorkspaces.supported,'limited');
+  assert.equal(manifest.capabilities.virtualWorkspaces.supported,'limited');
+  for (const setting of Object.values(manifest.contributes.configuration.properties)) {
+    assert.equal((setting as {scope: string}).scope, 'application');
+  }
   for (const icon of Object.values(manifest.contributes.languages[0].icon)) assert(fs.existsSync(path.join(extension,icon as string)));
   const config = JSON.parse(read('language-configuration.json'));
   assert.deepEqual(config.comments,{lineComment:'//',blockComment:['/*','*/']});
