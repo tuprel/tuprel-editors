@@ -27,8 +27,8 @@ Git attributes enforce LF on checkout, including when core.autocrlf is true.
 The original VSIX installed in desktop VS Code 1.146.0 with separate
 user-data and extensions directories. The process was launched with JAVA_HOME
 and JDK_HOME cleared and Java unavailable on PATH. The editor window opened
-schema.tuprel. Visual inspection was unavailable, so the two themes, snippets,
-editing actions and language indicator still need hands-on verification.
+schema.tuprel. The subsequent PR review validated the CI VSIX in a new isolated
+profile. See [desktop verification and captures](VERIFICATION.md#windows-desktop-vs-code).
 The extension manifest has no activation entry point.
 
 The official formatter issue is documented separately in

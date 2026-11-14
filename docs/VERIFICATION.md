@@ -1,31 +1,48 @@
-# Review evidence
+# VS Code MVP verification
 
-Local environment: Linux, Node 24.22.1, npm 11.9.0, OpenJDK 21.0.13.
+## Remote CI
 
-- Clean `npm ci --ignore-scripts`: passed.
-- Strict TypeScript check (`npm run lint`): passed.
-- Nine automated TextMate/Oniguruma integration tests: passed.
-- Full development dependency audit: zero vulnerabilities at verification time.
-- VSCE package creation and ZIP asset/manifest inspection: passed.
-- Official formatter probe: nine valid cases idempotent, non-comment token values
-  preserved; three invalid inputs refused. Exact multiline comment content changed
-  in two cases. Formatter integration remains gated on a separate core fix.
+Both GitHub Actions runs passed all six jobs on the tested extension revision
+bedd31a1206381a789053483a4509f2d66aa90aa. The matrix covers Windows, Ubuntu and
+macOS with Node.js 22 and 24.
 
-Raw output is in `docs/evidence/`. `artifacts/SHA256SUMS` records the packaged VSIX.
-The dependency lock intentionally overrides minimatch to 11.0.8: the VSCE 4.1.1
-range selected an advisory-affected release. Packaging and fixture tests pass with
-that override. No installation hooks or native signing binary are executed.
+- [PR #1 workflow](https://github.com/tuprel/tuprel-editors/actions/runs/43590174071)
+- [Branch push workflow](https://github.com/tuprel/tuprel-editors/actions/runs/43589490882)
 
-## Checks still pending
+Each job installs locked dependencies with scripts disabled, checks TypeScript,
+audits dependencies, runs the nine tests, packages and inspects the VSIX, and
+uploads the extension with SHA256SUMS.
 
-GitHub Actions has been configured for Windows, Linux and macOS on Node 22/24,
-but has not run: the remote repository was not created. These are local results,
-not remote CI evidence. No PR URL is available.
+The [Windows / Node 24 artifact](https://github.com/tuprel/tuprel-editors/actions/runs/43589490882/artifacts/14112145526)
+was downloaded and checked against the GitHub artifact digest and its VSIX
+checksum. The VSIX SHA-256 is
+439f72c93b63c3c4028b3ef6f127da8ff3a69c68166770558a397ed04230b9cd.
+All 11 files inside match the recovered Cloud VSIX byte for byte.
 
-VS Code is not installed in this environment. A clean editor installation,
-visual/theme review, actual editor shortcuts and UI behavior have not been
-verified here. TextMate tests and VSIX inspection do not replace that review.
-No IntelliJ ZIP, Plugin Verifier result or LSP integration is claimed.
+## Windows desktop VS Code
 
-The main repository was cloned for inspection only, with no file changes,
-branch pushes or effects on PRs #101, #102 or #103.
+Tested the CI VSIX in portable VS Code 1.146.0 with fresh, separate user-data
+and extension directories. JAVA_HOME and JDK_HOME were cleared and Java was
+absent from PATH. The extension installed as tuprel.tuprel-vscode@0.1.0.
+The window remained in Restricted Mode and the test used copies of the fixtures.
+
+| Check | Observed result |
+| --- | --- |
+| File recognition and lifecycle | Spring Products API, complete and playground schemas opened with TUPREL in the status bar. Closing the edited scratch file returned to the complete schema with TUPREL still active. |
+| Theme-driven highlighting | Declarations, scalar and custom types, attributes and strings rendered in [Light Modern](evidence/windows/complete-light.jpg) and [Dark Modern](evidence/windows/complete-dark.jpg). The [playground](evidence/windows/playground.jpg) also showed relation types and attributes. |
+| Snippets | Insert Snippet listed datasource, enum, generator and model. The [model snippet](evidence/windows/snippet.jpg) expanded and selected its name placeholder. The other three were observed in the picker. |
+| Comments | Ctrl+/ inserted a line comment and Shift+Alt+A wrapped selected text in a block comment. Both received comment highlighting in [the editor](evidence/windows/comments.jpg). |
+| Pairs and indentation | Typing opening braces, parentheses and quotes inserted their closing pair. Enter between braces produced a four-space body and an aligned closing brace. The [editor capture](evidence/windows/pairs-indent.jpg) and saved scratch file confirmed the result. |
+| Activation | The manifest contributes static assets and has no activation entry point. No Tuprel activation errors appeared in the inspected logs. The built-in VS Code agent host reported a startup timeout and the editor checks still passed. |
+
+## Local build and formatter
+
+On Windows, a fresh checkout passed the locked install, TypeScript check,
+compilation, all nine tests, VSIX packaging and package inspection. The npm audit
+reported zero vulnerabilities. The five fixture hashes were verified in a
+checkout with core.autocrlf enabled. See [Windows recovery notes](WINDOWS-VERIFICATION.md)
+and [historical Cloud logs](evidence/).
+
+The official formatter probe found that two cases changed exact multiline
+comment content. The [formatter issue](FORMATTER-ISSUE.md) records the separate
+core reproduction.
