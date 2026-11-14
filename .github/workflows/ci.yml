@@ -23,8 +23,12 @@ jobs:
       - run: npm audit --audit-level=moderate
       - run: npm run package
       - run: python tools/check-vsix.py
+      - name: Record VSIX SHA-256
+        run: python -c "from hashlib import sha256; from pathlib import Path; p = Path('artifacts/tuprel-vscode-0.1.0.vsix'); p.with_name('SHA256SUMS').write_bytes((sha256(p.read_bytes()).hexdigest() + '  ' + p.name + chr(10)).encode('ascii'))"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: tuprel-vscode-${{ matrix.os }}-node${{ matrix.node }}
-          path: artifacts/*.vsix
+          path: |
+            artifacts/*.vsix
+            artifacts/SHA256SUMS
           if-no-files-found: error

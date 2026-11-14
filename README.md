@@ -1,9 +1,7 @@
 # TUPREL Editor Extensions
 
 Editor tooling for the [TUPREL language](https://github.com/tuprel/tuprel).
-This repository contains the first VS Code syntax release. It is prepared for
-`tuprel/tuprel-editors`; remote repository creation and marketplace publication
-have not been performed.
+This repository contains the first VS Code syntax MVP.
 
 ## Install locally
 
@@ -70,6 +68,7 @@ No publishing tokens are required or stored.
 ## Review and next steps
 
 See [verification evidence](docs/VERIFICATION.md), the
+[Windows recovery and verification](docs/WINDOWS-VERIFICATION.md), the
 [frontend audit](docs/FRONTEND-AUDIT.md) and the
 [integration plan](docs/INTEGRATION-PLAN.md). Stop after review of this release;
 subsequent stages belong in separate PRs. Nothing here changes TUPREL main,
