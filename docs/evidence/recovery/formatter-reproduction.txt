@@ -1,0 +1,11 @@
+INPUT (spaces shown as ·):
+/*·block
+·*·detail
+·*/
+model·Product·{·id·UUID·@id·}
+OUTPUT (spaces shown as ·):
+/*·block
+*·detail
+*/
+model·Product·{·id·UUID·@id·}
+

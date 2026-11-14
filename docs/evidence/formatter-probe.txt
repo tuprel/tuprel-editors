@@ -1,0 +1,12 @@
+0 semantics=true idempotent=true exactComments=true
+1 semantics=true idempotent=true exactComments=true
+2 semantics=true idempotent=true exactComments=true
+3 semantics=true idempotent=true exactComments=false
+4 semantics=true idempotent=true exactComments=true
+5 semantics=true idempotent=true exactComments=true
+6 semantics=true idempotent=true exactComments=true
+7 semantics=true idempotent=true exactComments=true
+8 INVALID_REFUSED
+9 INVALID_REFUSED
+10 INVALID_REFUSED
+11 semantics=true idempotent=true exactComments=false

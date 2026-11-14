@@ -1,0 +1,45 @@
+{
+  "Model": {
+    "prefix": "model",
+    "body": [
+      "model ${1:Product} {",
+      "    id UUID @id",
+      "    ${2:name} String",
+      "$0",
+      "}"
+    ],
+    "description": "Model with a UUID primary key"
+  },
+  "Enum": {
+    "prefix": "enum",
+    "body": [
+      "enum ${1:Status} {",
+      "    ${2:ACTIVE}",
+      "    ${3:INACTIVE}",
+      "$0",
+      "}"
+    ],
+    "description": "Enum declaration"
+  },
+  "Generator": {
+    "prefix": "generator",
+    "body": [
+      "generator java {",
+      "    package = \"${1:example.generated}\"",
+      "$0",
+      "}"
+    ],
+    "description": "Java generator configuration"
+  },
+  "Datasource": {
+    "prefix": "datasource",
+    "body": [
+      "datasource db {",
+      "    provider = \"postgresql\"",
+      "    url = env(\"${1:DATABASE_URL}\")",
+      "$0",
+      "}"
+    ],
+    "description": "PostgreSQL datasource configuration; does not connect"
+  }
+}

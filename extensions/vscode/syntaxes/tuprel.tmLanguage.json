@@ -1,0 +1,99 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "TUPREL",
+  "scopeName": "source.tuprel",
+  "patterns": [
+    {
+      "name": "comment.line.double-slash.tuprel",
+      "begin": "//",
+      "end": "$"
+    },
+    {
+      "name": "comment.block.tuprel",
+      "begin": "/\\*",
+      "end": "\\*/"
+    },
+    {
+      "name": "string.quoted.double.tuprel",
+      "begin": "\"",
+      "end": "\"|(?=$)",
+      "patterns": [
+        {
+          "name": "constant.character.escape.tuprel",
+          "match": "\\\\(?:[\\\\\"nrt]|u[0-9A-Fa-f]{4})"
+        },
+        {
+          "name": "invalid.illegal.escape.tuprel",
+          "match": "\\\\."
+        }
+      ]
+    },
+    {
+      "match": "\\b(model|enum|datasource|generator)\\b(?:\\s+([A-Za-z_][A-Za-z_0-9]*))?",
+      "captures": {
+        "1": {
+          "name": "keyword.declaration.tuprel"
+        },
+        "2": {
+          "name": "entity.name.type.tuprel"
+        }
+      }
+    },
+    {
+      "name": "storage.type.tuprel",
+      "match": "\\b(?:String|Boolean|Short|Int|Long|Decimal|Float|Double|UUID|Instant|LocalDateTime|LocalDate|LocalTime|Bytes|Json)\\b"
+    },
+    {
+      "name": "entity.other.attribute-name.tuprel",
+      "match": "(?<!@)@@(?:index|unique)\\b|(?<!@)@(?:id|unique|default|relation|version)\\b"
+    },
+    {
+      "name": "constant.language.boolean.tuprel",
+      "match": "\\b(?:true|false)\\b"
+    },
+    {
+      "name": "constant.numeric.integer.tuprel",
+      "match": "(?<![A-Za-z_0-9])-?\\p{Nd}+"
+    },
+    {
+      "match": "\\b([A-Za-z_][A-Za-z_0-9]*)(\\s+)([A-Za-z_][A-Za-z_0-9]*)\\b",
+      "captures": {
+        "1": {
+          "name": "variable.other.property.tuprel"
+        },
+        "3": {
+          "patterns": [
+            {
+              "name": "storage.type.tuprel",
+              "match": "\\b(?:String|Boolean|Short|Int|Long|Decimal|Float|Double|UUID|Instant|LocalDateTime|LocalDate|LocalTime|Bytes|Json)\\b"
+            },
+            {
+              "name": "entity.name.type.tuprel",
+              "match": "[A-Za-z_][A-Za-z_0-9]*"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "keyword.operator.assignment.tuprel",
+      "match": "="
+    },
+    {
+      "name": "keyword.operator.optional.tuprel",
+      "match": "\\?"
+    },
+    {
+      "name": "punctuation.section.tuprel",
+      "match": "[{}\\[\\]()]"
+    },
+    {
+      "name": "punctuation.separator.tuprel",
+      "match": "[:,]"
+    },
+    {
+      "name": "variable.other.tuprel",
+      "match": "[A-Za-z_][A-Za-z_0-9]*"
+    }
+  ]
+}

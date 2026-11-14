@@ -1,0 +1,59 @@
+{
+  "name": "tuprel-vscode",
+  "displayName": "TUPREL",
+  "description": "TUPREL schema syntax highlighting, snippets and editing support.",
+  "version": "0.1.0",
+  "publisher": "tuprel",
+  "license": "Apache-2.0",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Snippets"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tuprel/tuprel-editors.git"
+  },
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": true
+    },
+    "virtualWorkspaces": {
+      "supported": true
+    }
+  },
+  "contributes": {
+    "languages": [
+      {
+        "id": "tuprel",
+        "aliases": [
+          "TUPREL",
+          "tuprel"
+        ],
+        "extensions": [
+          ".tuprel"
+        ],
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "./icons/tuprel-light.svg",
+          "dark": "./icons/tuprel-dark.svg"
+        }
+      }
+    ],
+    "grammars": [
+      {
+        "language": "tuprel",
+        "scopeName": "source.tuprel",
+        "path": "./syntaxes/tuprel.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "tuprel",
+        "path": "./snippets/tuprel.json"
+      }
+    ]
+  }
+}
