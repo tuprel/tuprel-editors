@@ -1,4 +1,4 @@
-# Staged integration contract (proposed, not implemented)
+# Staged integration contract
 
 ## PR 1 — syntax
 
@@ -57,12 +57,17 @@ ADR as a side effect of tooling work.
 
 ## PR 3 — VS Code intelligence
 
-Use the official VS Code language client with trusted, explicit server launch
-configuration. Test unsaved changes, simultaneous files, Unicode supplementary
-characters, LF/CRLF, stale validation, invalid formatting and server lifecycle.
-Enable Format on Save only after formatter and protocol gates. Completion, hover,
-outline and definitions are separate capabilities derived from official AST and
-symbol resolution, each with tests before advertisement.
+B3 uses the official Microsoft client with explicit Java and distribution
+paths in User Settings and local workspace trust. The adapter owns the
+full-text notifications so each tracked document can receive a session-wide
+monotonic wire version, including after a document closes and reopens.
+Diagnostics match that version and the current editor document. Formatting
+returns only edits whose editor snapshot is still current. Format on Save
+follows the user's VS Code settings.
+
+See the [extension README](../extensions/vscode/README.md) for installation,
+configuration and limitations. The official server is built from
+ad0c9c6898f5d924f725b6a6c49ac78ade272849 in the Extension Host workflow.
 
 ## PR 4 — IntelliJ native baseline
 

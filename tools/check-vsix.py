@@ -1,23 +1,28 @@
-"""Verify the actual review artifact, including its manifest and grammar."""
+"""Check the exact package allowlist and the bundled client payload."""
 import json
 from pathlib import Path
 from zipfile import ZipFile
 
-artifact = Path('artifacts/tuprel-vscode-0.1.0.vsix')
+source_root = Path('extensions/vscode')
+project = json.loads((source_root / 'package.json').read_text(encoding='utf-8'))
+artifact = Path('artifacts') / f"{project['name']}-{project['version']}.vsix"
 with ZipFile(artifact) as archive:
     names = set(archive.namelist())
-    required = {'[Content_Types].xml', 'extension.vsixmanifest',
-                'extension/package.json', 'extension/language-configuration.json',
-                'extension/syntaxes/tuprel.tmLanguage.json',
-                'extension/snippets/tuprel.json', 'extension/icons/tuprel-light.svg',
-                'extension/icons/tuprel-dark.svg', 'extension/readme.md',
-                'extension/LICENSE.txt'}
-    assert required <= names, required - names
-    assert not any('node_modules/' in n or n.endswith(('.jar', '.js', '.exe')) for n in names)
+    assets = {
+        'language-configuration.json', 'syntaxes/tuprel.tmLanguage.json',
+        'snippets/tuprel.json', 'icons/tuprel-light.svg', 'icons/tuprel-dark.svg',
+        'dist/extension.js', 'dist/THIRD-PARTY-LICENSES.txt',
+    }
+    required = {'[Content_Types].xml', 'extension.vsixmanifest', 'extension/package.json',
+                'extension/readme.md', 'extension/LICENSE.txt', 'extension/changelog.md'}
+    required |= {f'extension/{name}' for name in assets}
+    assert names == required, (required - names, names - required)
+    assert archive.testzip() is None
     manifest = json.loads(archive.read('extension/package.json'))
+    assert manifest['main'] == './dist/extension.js'
     assert manifest['contributes']['languages'][0]['extensions'] == ['.tuprel']
-    assert 'main' not in manifest
-    for packaged, source in [('extension/syntaxes/tuprel.tmLanguage.json', 'syntaxes/tuprel.tmLanguage.json'),
-                              ('extension/snippets/tuprel.json', 'snippets/tuprel.json')]:
-        assert archive.read(packaged) == (Path('extensions/vscode') / source).read_bytes()
-    print(f'PASS: {len(names)} packaged files; required assets present; no executable payload')
+    for name in assets:
+        assert archive.read(f'extension/{name}') == (source_root / name).read_bytes(), name
+    legal = archive.read('extension/dist/THIRD-PARTY-LICENSES.txt')
+    assert b'Microsoft' in legal
+    print(f'PASS: {len(names)} files, bundled client and license notices verified')

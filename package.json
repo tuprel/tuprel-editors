@@ -3,19 +3,28 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && esbuild extensions/vscode/src/extension.ts --bundle --platform=node --target=node18 --external:vscode --legal-comments=inline --outfile=extensions/vscode/dist/extension.js && node tools/bundle-licenses.cjs",
     "test": "npm run build && node --test --test-reporter=tap dist/tests/*.test.js",
     "lint": "tsc -p tsconfig.json --noEmit",
-    "package": "npm run test && cd extensions/vscode && vsce package --out ../../artifacts/tuprel-vscode-0.1.0.vsix"
+    "package": "npm run test && cd extensions/vscode && vsce package --no-dependencies --out ../../artifacts/tuprel-vscode-0.1.0.vsix",
+    "test:host": "npm run build && node dist/tests/host/run.js"
   },
   "devDependencies": {
     "@types/node": "22.19.11",
+    "@types/vscode": "1.85.0",
+    "@vscode/test-electron": "3.1.0",
     "@vscode/vsce": "4.1.1",
+    "esbuild": "0.28.2",
     "typescript": "5.9.3",
     "vscode-oniguruma": "2.0.1",
     "vscode-textmate": "9.3.2"
   },
   "overrides": {
-    "minimatch": "11.0.8"
+    "@vscode/vsce": {
+      "minimatch": "11.0.8"
+    }
+  },
+  "dependencies": {
+    "vscode-languageclient": "9.0.1"
   }
 }

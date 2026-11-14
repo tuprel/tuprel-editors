@@ -10,6 +10,7 @@
     "skipLibCheck": true
   },
   "include": [
-    "tests/**/*.ts"
+    "tests/**/*.ts",
+    "extensions/vscode/src/**/*.ts"
   ]
 }
