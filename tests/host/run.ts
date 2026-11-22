@@ -1,5 +1,6 @@
 import { downloadAndUnzipVSCode, resolveCliPathFromVSCodeExecutablePath } from '@vscode/test-electron';
-import { execFileSync, spawn } from 'node:child_process';
+import { execFileSync, spawn, spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
@@ -11,9 +12,29 @@ async function run(): Promise<void> {
     if (!java || !distribution || !path.isAbsolute(java) || !path.isAbsolute(distribution)) {
         throw new Error('Set TUPREL_TEST_JAVA and TUPREL_TEST_DISTRIBUTION to explicit absolute paths.');
     }
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'tuprel-host-'));
+    const incompatible = process.env.TUPREL_TEST_BAD_JAVA;
+    if (!incompatible || !path.isAbsolute(incompatible)) throw new Error('Set TUPREL_TEST_BAD_JAVA to an actual Java 11 executable.');
+    const identity = spawnSync(java, ['-XshowSettings:properties', '-version'], {encoding: 'utf8', timeout: 10_000});
+    const version = /java.specification.version = (17|21|25)\b/.exec(identity.stdout + identity.stderr)?.[1];
+    if (identity.status !== 0 || !version || (process.env.TUPREL_TEST_CELL && process.env.TUPREL_TEST_CELL !== 'java' + version)) {
+        throw new Error('The selected JVM does not match the certification cell.');
+    }
+    const badIdentity = spawnSync(incompatible, ['-XshowSettings:properties', '-version'], {encoding: 'utf8', timeout: 10_000});
+    if (badIdentity.status !== 0 || !/java.specification.version = 11\b/.test(badIdentity.stdout + badIdentity.stderr)) {
+        throw new Error('The incompatible-JVM fixture must actually run Java 11.');
+    }
+    const refusal = spawnSync(incompatible, ['-cp', path.join(distribution, 'lib', '*'), 'dev.tuprel.lsp.TuprelLanguageServer'],
+        {encoding: 'utf8', timeout: 10_000});
+    if (refusal.status === null || refusal.status === 0 || refusal.error || !refusal.stderr?.includes('UnsupportedClassVersionError')) {
+        throw new Error('The installed server must refuse the real incompatible JVM.');
+    }
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'tuprel-host-external consumer '));
     const extensions = path.join(root, 'extensions');
     const artifact = path.resolve('artifacts/tuprel-vscode-0.1.0.vsix');
+    const inventory: Record<string, string> = {};
+    for (const name of (await fs.readdir(path.join(distribution, 'lib'))).sort()) {
+        inventory[name] = createHash('sha256').update(await fs.readFile(path.join(distribution, 'lib', name))).digest('hex');
+    }
     const mock = path.join(root, 'mock');
     const mockLib = path.join(mock, 'lib');
     const officialLib = path.join(distribution, 'lib');
@@ -27,7 +48,7 @@ async function run(): Promise<void> {
     const classes = path.join(mock, 'classes');
     await fs.mkdir(classes);
     execFileSync(path.join(path.dirname(java), 'javac' + suffix), [
-        '--release', '21', '-cp', path.join(mockLib, gson), '-d', classes, 'tests/host/TuprelLanguageServer.java',
+        '--release', '17', '-cp', path.join(mockLib, gson), '-d', classes, 'tests/host/TuprelLanguageServer.java',
     ], {stdio: 'inherit'});
     execFileSync(path.join(path.dirname(java), 'jar' + suffix), [
         '--create', '--file', path.join(mockLib, 'tuprel-language-server.jar'), '-C', classes, '.',
@@ -85,5 +106,21 @@ async function run(): Promise<void> {
             });
         });
     }
+    const evidence = path.resolve('artifacts', 'd2-' + (process.env.TUPREL_TEST_CELL ?? 'local'));
+    await fs.mkdir(evidence, {recursive: true});
+    await fs.copyFile(path.join(root, 'servers.jsonl'), path.join(evidence, 'servers.jsonl'));
+    const finalNames = (await fs.readdir(path.join(distribution, 'lib'))).sort();
+    if (JSON.stringify(finalNames) !== JSON.stringify(Object.keys(inventory))) throw new Error('Server distribution inventory changed.');
+    for (const name of finalNames) {
+        if (createHash('sha256').update(await fs.readFile(path.join(distribution, 'lib', name))).digest('hex') !== inventory[name]) {
+            throw new Error('Installed server bytes changed during the Extension Host proof.');
+        }
+    }
+    await fs.writeFile(path.join(evidence, 'identity.json'), JSON.stringify({
+        serverRevision: process.env.TUPREL_TEST_SERVER_REVISION,
+        jvm: identity.stdout + identity.stderr, incompatibleJvm: badIdentity.stdout + badIdentity.stderr,
+        incompatibleRefused: true, version, inventory,
+        vsix: createHash('sha256').update(await fs.readFile(artifact)).digest('hex'),
+    }, null, 2) + '\n');
 }
 void run().catch(error => { console.error(error); process.exitCode = 1; });

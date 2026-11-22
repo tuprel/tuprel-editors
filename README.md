@@ -25,12 +25,16 @@ python tools/check-vsix.py
 ```
 
 The Extension Host test installs the built VSIX into a fresh profile.
-Build the official server from ad0c9c6898f5d924f725b6a6c49ac78ade272849
+Build the official server from 3436cc4f2d0ec227f7130ebd2c4650dba601e82b
 with strict verification. Set TUPREL_TEST_JAVA and
 TUPREL_TEST_DISTRIBUTION to absolute paths, then run npm run test:host.
 Set TUPREL_TEST_VSCODE to test an existing desktop binary. The default
 downloads the pinned VS Code 1.85.2 for testing. The CI builds the pinned
 server and exercises the installed VSIX on Windows, macOS and Linux.
+The [D2 staging matrix](docs/JAVA-LTS-CERTIFICATION.md) tests Java 17, 21 and
+25 on Windows/Linux and retains macOS Java 21 coverage. Java 21 remains the
+public minimum. Set `TUPREL_TEST_BAD_JAVA` to a real Java 11 executable for
+the incompatible-JVM and recovery proof.
 
 Fixtures retain their upstream Apache-2.0 license. See
 [provenance](fixtures/provenance.json) and the
