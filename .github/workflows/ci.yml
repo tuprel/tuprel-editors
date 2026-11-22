@@ -47,7 +47,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           repository: tuprel/tuprel
-          ref: ad0c9c6898f5d924f725b6a6c49ac78ade272849
+          ref: 3436cc4f2d0ec227f7130ebd2c4650dba601e82b
           path: .official-server
           persist-credentials: false
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
@@ -55,6 +55,22 @@ jobs:
           node-version: '24'
           cache: npm
       - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad
+        id: jdk17
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad
+        id: jdk25
+        with:
+          distribution: temurin
+          java-version: '25'
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad
+        id: jdk11
+        with:
+          distribution: temurin
+          java-version: '11'
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad
+        id: jdk21
         with:
           distribution: temurin
           java-version: '21'
@@ -62,18 +78,41 @@ jobs:
         working-directory: .official-server
         shell: bash
         run: |
-          test "$(git rev-parse HEAD)" = ad0c9c6898f5d924f725b6a6c49ac78ade272849
+          test "$(git rev-parse HEAD)" = 3436cc4f2d0ec227f7130ebd2c4650dba601e82b
           ./gradlew :tuprel-language-server:installDist --no-daemon --dependency-verification strict
       - run: npm ci --ignore-scripts
       - run: npm run package
       - run: python tools/check-vsix.py
       - name: Run tests from the installed VSIX
         shell: bash
+        env:
+          JDK17: ${{ steps.jdk17.outputs.path }}
+          JDK21: ${{ steps.jdk21.outputs.path }}
+          JDK25: ${{ steps.jdk25.outputs.path }}
+          JDK11: ${{ steps.jdk11.outputs.path }}
         run: |
-          export TUPREL_TEST_DISTRIBUTION="$GITHUB_WORKSPACE/.official-server/tuprel-language-server/build/install/tuprel-language-server"
-          export TUPREL_TEST_JAVA="$JAVA_HOME/bin/java"
-          case "$RUNNER_OS" in
-            Windows) export TUPREL_TEST_JAVA="$TUPREL_TEST_JAVA.exe"; npm run test:host ;;
-            Linux) xvfb-run -a npm run test:host ;;
-            macOS) npm run test:host ;;
-          esac
+          export TUPREL_TEST_SERVER_REVISION=3436cc4f2d0ec227f7130ebd2c4650dba601e82b
+          export TUPREL_TEST_DISTRIBUTION="$RUNNER_TEMP/tuprel D2 installed server"
+          cp -R .official-server/tuprel-language-server/build/install/tuprel-language-server "$TUPREL_TEST_DISTRIBUTION"
+          versions='17 21 25'
+          if [ "$RUNNER_OS" = macOS ]; then versions='21'; fi
+          suffix=''
+          if [ "$RUNNER_OS" = Windows ]; then suffix='.exe'; fi
+          export TUPREL_TEST_BAD_JAVA="$JDK11/bin/java$suffix"
+          for version in $versions; do
+            case "$version" in
+              17) selected="$JDK17" ;;
+              21) selected="$JDK21" ;;
+              25) selected="$JDK25" ;;
+            esac
+            export TUPREL_TEST_JAVA="$selected/bin/java$suffix"
+            export TUPREL_TEST_CELL="java$version"
+            if [ "$RUNNER_OS" = Linux ]; then xvfb-run -a npm run test:host; else npm run test:host; fi
+          done
+      - name: Preserve JVM and process evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: extension-host-lts-${{ matrix.os }}
+          path: artifacts/d2-*/
+          if-no-files-found: error

@@ -67,7 +67,10 @@ follows the user's VS Code settings.
 
 See the [extension README](../extensions/vscode/README.md) for installation,
 configuration and limitations. The official server is built from
-ad0c9c6898f5d924f725b6a6c49ac78ade272849 in the Extension Host workflow.
+3436cc4f2d0ec227f7130ebd2c4650dba601e82b in the Extension Host workflow.
+The [D2 certification](JAVA-LTS-CERTIFICATION.md) records the staging LTS
+matrix and incompatible-JVM recovery. This keeps Java 21 as the public minimum
+and adds no completion, hover or definition providers to the editor.
 
 ## PR 4 — IntelliJ native baseline
 

@@ -4,6 +4,7 @@ import { existsSync } from 'node:fs';
 import * as path from 'node:path';
 import * as vscode from 'vscode';
 import { permitsServer } from '../../extensions/vscode/src/documents';
+import { exited, recordServer, servers } from './serverEvidence';
 
 const good = 'model User {\n    id Int @id\n}\n';
 const malformed = 'model User{ id Int @id }';
@@ -78,6 +79,7 @@ export async function run(): Promise<void> {
     }
 
     await until(() => diagnostics(first).some(item => item.code === 'TUPREL-SCHEMA-LEX-001'), 'lexical diagnostic');
+    const initialServer = await recordServer();
     const lexical = diagnostics(first).find(item => item.code === 'TUPREL-SCHEMA-LEX-001')!;
     assert.deepEqual([lexical.range.start.line, lexical.range.start.character], [0, 9]);
     assert.match(lexical.message, /Unexpected character/);
@@ -137,4 +139,36 @@ export async function run(): Promise<void> {
     await vscode.commands.executeCommand('tuprel.restartLanguageServer');
     assert.deepEqual(await format(first) ?? [], []);
     console.log('PASS: closing clears diagnostics and missing or invalid Java retains syntax');
+
+    await exited(initialServer);
+    const incompatible = process.env.TUPREL_TEST_BAD_JAVA;
+    assert(incompatible && path.isAbsolute(incompatible), 'an actual incompatible JVM is required');
+    await config.update('javaPath', incompatible, languageScope);
+    await vscode.commands.executeCommand('tuprel.restartLanguageServer');
+    assert.deepEqual(await servers(), [], 'incompatible JVM must terminate');
+    assert.deepEqual(await format(first) ?? [], []);
+    assert.equal(first.languageId, 'tuprel');
+    const snippet = await vscode.workspace.openTextDocument({language: 'tuprel', content: ''});
+    await vscode.window.showTextDocument(snippet);
+    await vscode.commands.executeCommand('editor.action.insertSnippet', {langId: 'tuprel', name: 'Model'});
+    assert.match(snippet.getText(), /model .*\{/);
+    console.log('PASS: incompatible JVM stops; schema language and snippets remain available');
+
+    await config.update('javaPath', process.env.TUPREL_TEST_JAVA, languageScope);
+    await vscode.commands.executeCommand('tuprel.restartLanguageServer');
+    await change(first, 'model');
+    await until(() => diagnostics(first).some(item => String(item.code).startsWith('TUPREL-SCHEMA-PARSE-')), 'diagnostics after Restart Language Server');
+    const recoveredServer = await recordServer();
+    await change(first, malformed);
+    await until(() => diagnostics(first).length === 0, 'recovered diagnostics clear');
+    const recoveredEdits = await format(first);
+    assert(recoveredEdits && recoveredEdits.length > 0);
+    const recoveredFormatting = new vscode.WorkspaceEdit();
+    recoveredFormatting.set(first.uri, recoveredEdits);
+    assert(await vscode.workspace.applyEdit(recoveredFormatting));
+    assert.equal(first.getText().replaceAll('\r\n', '\n'), good);
+    await config.update('javaPath', undefined, languageScope);
+    await vscode.commands.executeCommand('tuprel.restartLanguageServer');
+    await exited(recoveredServer);
+    console.log('PASS: corrected JVM and Restart Language Server restore diagnostics and formatting; shutdown terminates the process');
 }
